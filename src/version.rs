@@ -1,1 +1,0 @@
-pub const VERSION : &'static str = "b316aeab2b499add5d5bb536e73d810f48be2697";

@@ -20,6 +20,7 @@ impl LogLevel {
 		}
 	}
 
+	#[inline(always)]
 	pub fn to_i8(&self) -> i8 {
 		match &self {
 			LogLevel::Debug => 0,

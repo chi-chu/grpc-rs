@@ -1,7 +1,7 @@
 use std::env;
 use chrono::Local;
 
-const PORT: u16 = 8088;
+const PORT: u16 = 8080;
 
 pub fn get_port() -> u16 {
 	match env::args().nth(1) {
@@ -15,7 +15,7 @@ pub fn get_port() -> u16 {
 			}
 		},
 		None => {
-			error!("use default port {}", PORT);
+			error!("no port param find use default port {}", PORT);
 			PORT
 		},
 	}
