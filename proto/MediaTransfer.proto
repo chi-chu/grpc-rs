@@ -1,0 +1,222 @@
+syntax = "proto3";
+
+package exchangeclient;
+
+service MediaExchangeService {
+    rpc AddMediaSession(AddSessionRequest) returns (AddSessionResponse) {}
+    rpc UpdateMediaSession(UpdateSessionRequest) returns (UpdateSessionResponse) {}
+    rpc DeleteMediaSession(DeleteSessionRequest) returns (DeleteSessionResponse) {}
+    rpc AddTransferRule(AddTransferRuleRequest) returns (AddTransferRuleResponse) {}
+    rpc UpdateTransferRule(UpdateTransferRuleRequest) returns (UpdateTransferRuleResponse) {}
+    rpc DeleteTransferRule(DeleteTransferRuleRequest) returns (DeleteTransferRuleResponse) {}
+    rpc QueryMediaSession(QuerySessionRequest) returns (QuerySessionResponse) {}
+    rpc QueryTransferRule(QueryTransferRuleRequest) returns (QueryTransferRuleResponse) {}
+
+    // 旧接口，即将废弃
+    rpc AddMediaChannel(AddChannelRequest) returns (AddChannelResponse) {}
+    rpc UpdateMediaChannel(UpdateMediaChannelRequest) returns (UpdateMediaChannelResponse) {}
+    rpc DeleteMediaChannel(DeleteMediaChannelRequst) returns (DeleteMediaChannelResponse){}
+    rpc SetTransferRule(SetTransferRuleRequest) returns (Result){}
+    rpc QueryChannel(QueryChannelRequest)returns(QueryChannelResponse){}
+    rpc QuerySrcByConsumer(QuerySrcByConsumerRequest)returns(QuerySrcByConsumerResponse){} 
+    rpc QueryConsumersBySrc(QueryConsumersBySrcRequest)returns(QueryConsumersBySrcResponse){}
+    rpc QueryAllRelations(QueryAllRelationsRequest)returns(QueryAllRelationsResponse){}
+}
+
+message AddSessionRequest{
+  string session_id = 1;
+  string local_sdp = 2;
+}
+message AddSessionResponse{
+  Result result = 1;
+  string local_sdp = 2;
+}
+
+message UpdateSessionRequest{
+  string session_id = 1;
+  bool is_local = 2;
+  string sdp = 3;
+}
+message UpdateSessionResponse{
+  Result result = 1;
+  string sdp = 2;
+}
+
+message DeleteSessionRequest{
+  string session_id = 1;
+}
+message DeleteSessionResponse{
+  Result result = 1;
+}
+
+message AddTransferRuleRequest{
+  string rule_id = 1;
+  string session_id_from = 2;
+  string session_id_to = 3;
+  repeated string rtpids_from = 4;
+  repeated string rtpids_to = 5;
+}
+message AddTransferRuleResponse{
+  Result result = 1;
+  repeated string rtpids_from = 2;
+  repeated string rtpids_to = 3;
+}
+
+message UpdateTransferRuleRequest{
+  string rule_id = 1;
+  repeated string rtpids_from = 2;
+  repeated string rtpids_to = 3;
+}
+message UpdateTransferRuleResponse{
+  Result result = 1;
+  repeated string rtpids_from = 2;
+  repeated string rtpids_to = 3;
+}
+
+message DeleteTransferRuleRequest{
+  string rule_id = 1;
+}
+message DeleteTransferRuleResponse{
+  Result result = 1;
+}
+
+message QuerySessionRequest{
+  string session_id = 1;
+}
+message QuerySessionResponse{
+  Result result = 1;
+  string local_sdp = 2;
+  string remote_sdp = 3;
+}
+
+message QueryTransferRuleRequest{
+  string rule_id = 1;
+}
+message QueryTransferRuleResponse{
+  Result result = 1;
+  string session_id_from = 2;
+  string session_id_to = 3;
+  repeated string rtpids_from = 4;
+  repeated string rtpids_to = 5;
+}
+
+////////////////////////////////旧接口 (即将废弃) //////////////////////////
+message Result{
+    int32 code = 1;
+    string description = 2;
+}
+
+enum EMediaType{
+    MEDIA_TYPE_NONE = 0;
+    AUDIO = 1;
+    VIDEO = 2;
+    AVBOTH = 3;  
+}
+
+enum EMediaDirection{
+    // DIRNONE - 方向不明
+    DIRNONE = 0;
+    // SENDONLY -
+    SENDONLY = 1;
+    // RECVONLY -
+    RECVONLY = 2;
+    // SENDRECV -
+    SENDRECV = 3;
+}
+
+message MediaDesc{
+  string type = 1;
+}
+
+message TransferDesc {
+  string IP = 1;          
+  uint32 Port = 2;         
+  bool enablePortMux = 3;
+  uint32 portMuxID = 4;        
+}
+
+message AddChannelRequest{
+  string type = 1;
+  string dir = 2;
+  string endpoint_ID = 3;
+}
+message AddChannelResponse{
+  Result result = 1;
+  string rtpid = 2;
+  MediaDesc desc = 3;
+  TransferDesc local = 4;
+  string srtp_desc = 5;
+}
+
+message UpdateMediaChannelRequest{
+  string rtpid = 1;
+  TransferDesc remote_transfer_desc = 2;
+  string srtp_desc = 3;
+}
+message UpdateMediaChannelResponse{
+  Result result = 1;
+  string rtpid = 2;
+  MediaDesc desc = 3;
+  TransferDesc local_transfer_desc = 4;
+  TransferDesc remote_transfer_desc = 5;
+}
+
+message DeleteMediaChannelRequst{
+  string rtpid = 1;
+  bool bForce = 2;
+}
+message DeleteMediaChannelResponse{
+  Result result = 1;
+  repeated string srcs = 2;
+  repeated string dsts = 3;
+}
+
+message TransferRule{
+  string from = 1;
+  string to = 2;
+  bool bAdd = 3;
+}
+message SetTransferRuleRequest{
+  repeated TransferRule rules = 1;
+}
+
+message ChannelInfo{
+  MediaDesc desc = 1;
+  TransferDesc local_transfer_desc = 2;
+  TransferDesc remote_transfer_desc = 3;
+  bool bConnected = 4;
+}
+message QueryChannelRequest{
+  string rtpid = 1;  //为空表示返回所有channels
+}
+message QueryChannelResponse{
+  Result result = 1;
+  repeated ChannelInfo infos = 2;
+}
+
+message QuerySrcByConsumerRequest{
+  string rtpid = 1;
+}
+message QuerySrcByConsumerResponse{
+  Result result = 1;
+  string rtpid = 2;
+}
+
+message QueryConsumersBySrcRequest{
+  string rtpid = 1;
+}
+message QueryConsumersBySrcResponse{
+  Result result = 1;
+  repeated string rtpids = 2;
+}
+
+message TransferPair{
+  string from = 1;
+  string to = 2;
+}
+message QueryAllRelationsRequest{
+}
+message QueryAllRelationsResponse{
+  Result result = 1;
+  repeated TransferPair relations = 2;
+}
